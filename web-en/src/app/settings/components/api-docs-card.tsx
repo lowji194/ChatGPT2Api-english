@@ -247,8 +247,9 @@ const responseExamples: Record<string, object> = {
 
 function CodeBlock({ code, language = "bash", label }: { code: string; language?: "bash" | "json"; label: string }) {
   const [copied, setCopied] = useState(false);
+  const lineContinuation = " \\" + "\n  ";
   const displayCode = language === "bash"
-    ? code.replace(/\s+(-(?:H|d|F)\s)/g, " \\\\\n  $1")
+    ? code.replace(/\s+(-(?:H|d|F)\s)/g, `${lineContinuation}$1`)
     : code;
   const tokens = displayCode.split(/("(?:\\.|[^"\\])*"|\b(?:true|false|null)\b|\b\d+(?:\.\d+)?\b|(?:^|\s)(?:curl|-H|-d|-F)\b)/gm);
   const copy = async () => {

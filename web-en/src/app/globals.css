@@ -18,7 +18,6 @@
   --radius-sm: calc(var(--radius) - 3px); --radius-md: calc(var(--radius) - 1px);
   --radius-lg: var(--radius); --radius-xl: calc(var(--radius) + 3px);
 }
-
 :root {
   --radius:.625rem; --font-app-sans:Inter,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   --font-app-mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
@@ -76,3 +75,46 @@
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 @keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 ::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
+
+
+/* Locale flag: CSS-rendered to avoid platform emoji/font fallback. */
+button[title="English"] > span:first-child,
+button[title="Tiếng Việt"] > span:first-child {
+  position: relative;
+  display: inline-block;
+  width: 24px;
+  height: 16px;
+  flex: 0 0 24px;
+  overflow: hidden;
+  border-radius: 2px;
+  color: transparent;
+  font-size: 0;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.18);
+}
+button[title="English"] > span:first-child {
+  background: #da251d;
+}
+button[title="English"] > span:first-child::after {
+  content: "★";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #ff0;
+  font-size: 10px;
+  line-height: 1;
+}
+button[title="Tiếng Việt"] > span:first-child {
+  background: repeating-linear-gradient(to bottom, #b22234 0 1.23px, #fff 1.23px 2.46px);
+}
+button[title="Tiếng Việt"] > span:first-child::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 11px;
+  height: 9px;
+  background-color: #3c3b6e;
+  background-image: radial-gradient(circle, #fff 0 0.5px, transparent 0.65px);
+  background-size: 3px 3px;
+}
+
