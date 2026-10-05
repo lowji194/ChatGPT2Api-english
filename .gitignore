@@ -1,0 +1,44 @@
+# Secrets and local configuration
+config.json
+.env
+.env.*
+!.env.example
+
+# Runtime data and credentials
+data/
+logs/
+backups/
+*.log
+*.db
+*.sqlite
+*.sqlite3
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+build/
+dist/
+wheels/
+*.egg-info/
+
+# Frontend dependencies and generated output
+node_modules/
+.next/
+out/
+web_dist/
+web_dist_en/
+
+# Editors and local tools
+.idea/
+.vscode/
+.claude/settings.local.json
+
+# Local deployment/test output
+docker-compose-local.yml
+git_cache/
+loginwithpassword_*/
+logwithemailverifycode_*/
+test_batch_output/
+web_dist.pre-*/
+.backup_time

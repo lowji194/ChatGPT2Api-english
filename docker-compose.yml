@@ -1,0 +1,30 @@
+services:
+  app:
+    build: .
+    image: lowji194/chatgpt2api-english:local
+    container_name: chatgpt2api
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    volumes:
+      - ./data:/app/data
+      - ./config.json:/app/config.json
+    environment:
+      # Storage backend: json, sqlite, postgres, or git.
+      - STORAGE_BACKEND=json
+      
+      # Database settings for sqlite/postgres.
+      # - DATABASE_URL=postgresql://user:password@host:5432/dbname
+      # - DATABASE_URL=sqlite:///app/data/accounts.db
+      
+      # Private Git storage settings.
+      # - GIT_REPO_URL=https://github.com/user/repo.git
+      # - GIT_TOKEN=ghp_xxxxxxxxxxxx
+      # - GIT_BRANCH=main
+      # - GIT_FILE_PATH=accounts.json
+      
+      # Optional authentication key override.
+      # - CHATGPT2API_AUTH_KEY=your_secret_key
+      
+      # Optional public base URL.
+      # - CHATGPT2API_BASE_URL=https://your-domain.com
