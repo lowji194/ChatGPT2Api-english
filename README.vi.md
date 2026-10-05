@@ -99,9 +99,15 @@ docker compose -f docker-compose.warp.yml up -d --build
 - Đặt dịch vụ sau TLS và giới hạn quyền truy cập bảng quản trị.
 - Tự kiểm tra điều khoản nền tảng và tài khoản trước khi triển khai.
 
-## Donate và hỗ trợ
+## ☕ Mời tôi một ly cà phê
 
-Nếu dự án giúp tiết kiệm thời gian, bạn có thể ủng hộ việc duy trì bằng cách liên hệ [@theloi194 trên Telegram](https://t.me/theloi194). Thông tin donate được cung cấp tại đó để không hard-code dữ liệu thanh toán trong repo.
+Nếu dự án này hữu ích, một ly cà phê từ bạn sẽ là động lực tuyệt vời để tôi tiếp tục cải tiến và duy trì dự án.
+
+<p align="center">
+  <img src="https://theloi.io.vn/pay/QR.png?text=QR+Code" alt="Mời cà phê" width="240" />
+</p>
+
+Hỗ trợ và trao đổi: [Telegram @theloi194](https://t.me/theloi194).
 
 ## Ghi nhận
 

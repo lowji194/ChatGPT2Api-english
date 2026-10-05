@@ -35,8 +35,17 @@ export function TopNav() {
   const pathname = usePathname();
   const router = useRouter();
   const [session, setSession] = useState<StoredAuthSession | null | undefined>(undefined);
+  const [locale, setLocale] = useState<"vi" | "en">("vi");
 
   useEffect(() => { let active = true; void (async () => { if (pathname === "/login") { if (active) setSession(null); return; } const stored = await getValidatedAuthSession(); if (active) setSession(stored); })(); return () => { active = false; }; }, [pathname]);
+  useEffect(() => {
+    let active = true;
+    void fetch("/api/locale", { credentials: "same-origin" })
+      .then((response) => response.json())
+      .then((data) => { if (active) setLocale(data?.locale === "en" ? "en" : "vi"); })
+      .catch(() => undefined);
+    return () => { active = false; };
+  }, []);
 
   if (pathname === "/login" || session === null) return null;
   if (session === undefined) return <div className="h-14 bg-slate-950" />;
@@ -44,13 +53,19 @@ export function TopNav() {
   const items = session.role === "admin" ? adminNavItems : userNavItems;
   const home = getDefaultRouteForRole(session.role);
   const logout = async () => { await clearStoredAuthSession(); router.replace("/login"); };
+  const switchLocale = () => {
+    const nextLocale = locale === "vi" ? "en" : "vi";
+    const secure = window.location.protocol === "https:" ? "; Secure" : "";
+    document.cookie = `app_locale=${nextLocale}; Path=/; Max-Age=31536000; SameSite=Lax${secure}`;
+    window.location.reload();
+  };
 
   return <>
     <header className="sticky top-0 z-40 bg-slate-950 text-white shadow-sm">
       <div className="mx-auto flex h-14 w-full max-w-[1680px] items-center gap-3 px-3 sm:px-5 lg:px-6">
         <Brand href={home} />
         <div className="hidden min-w-0 flex-1 justify-center md:flex"><MenuItems items={items} pathname={pathname} /></div>
-        <div className="ml-auto flex items-center gap-1"><span className="mr-1 hidden items-center gap-1.5 text-xs text-slate-400 lg:inline-flex"><span className="size-2 rounded-full bg-emerald-400" />Operational</span><div className="[&_button]:text-slate-300 [&_button:hover]:bg-white/10 [&_button:hover]:text-white"><HeaderActions showGithubText={false} /></div><button type="button" onClick={() => void logout()} className="flex size-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/10 hover:text-white" aria-label="Sign out" title="Sign out"><LogOut className="size-4" /></button></div>
+        <div className="ml-auto flex items-center gap-1"><span className="mr-1 hidden items-center gap-1.5 text-xs text-slate-400 lg:inline-flex"><span className="size-2 rounded-full bg-emerald-400" />Operational</span><button type="button" onClick={switchLocale} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-white/15 bg-white/5 px-2.5 text-xs font-semibold text-white transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50" aria-label={locale === "vi" ? "Switch to English" : "Chuyển sang tiếng Việt"} title={locale === "vi" ? "English" : "Tiếng Việt"}><span className="text-base leading-none" aria-hidden="true">{locale === "vi" ? "🇻🇳" : "🇺🇸"}</span><span>{locale.toUpperCase()}</span></button><div className="[&_button]:text-slate-300 [&_button:hover]:bg-white/10 [&_button:hover]:text-white"><HeaderActions showGithubText={false} /></div><button type="button" onClick={() => void logout()} className="flex size-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/10 hover:text-white" aria-label="Sign out" title="Sign out"><LogOut className="size-4" /></button></div>
       </div>
       <div className="hide-scrollbar overflow-x-auto border-t border-white/10 md:hidden"><div className="flex min-w-max px-2 py-1"><MenuItems items={items} pathname={pathname} /></div></div>
     </header>

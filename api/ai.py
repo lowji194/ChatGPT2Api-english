@@ -8,6 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from api.image_inputs import parse_image_edit_request, read_image_sources
 from api.support import require_identity, resolve_image_base_url
 from services.content_filter import check_request, request_shape, request_text
+from services.account_service import account_service
 from services.editable_file_task_service import editable_file_task_service
 from services.log_service import LoggedCall
 from services.protocol import (
@@ -87,6 +88,18 @@ def create_router() -> APIRouter:
             return await run_in_threadpool(openai_v1_models.list_models)
         except Exception as exc:
             raise HTTPException(status_code=502, detail={"error": str(exc)}) from exc
+
+    @router.get("/v1/image-quota")
+    async def get_image_quota(authorization: str | None = Header(default=None)):
+        require_identity(authorization)
+        stats = await run_in_threadpool(account_service.get_stats)
+        return {
+            "object": "image_quota",
+            "total_remaining": int(stats.get("total_quota") or 0),
+            "active_accounts": int(stats.get("active") or 0),
+            "limited_accounts": int(stats.get("limited") or 0),
+            "unit": "images",
+        }
 
     @router.post("/v1/images/generations")
     async def generate_images(

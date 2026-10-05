@@ -99,9 +99,15 @@ Use account-level proxies when available; otherwise WARP/Privoxy can provide a s
 - Put the service behind TLS and restrict the administration console.
 - Review account and platform terms before deployment.
 
-## Donate and support
+## ☕ Buy me a coffee
 
-If this edition saves you time, you can support continued maintenance by contacting [@theloi194 on Telegram](https://t.me/theloi194). Donation details are shared there so payment information is not hard-coded into the repository.
+If this edition saves you time, a coffee from you is wonderful motivation to keep improving and maintaining the project.
+
+<p align="center">
+  <img src="https://theloi.io.vn/pay/QR.png?text=QR+Code" alt="Buy me a coffee QR code" width="240" />
+</p>
+
+Support and questions: [Telegram @theloi194](https://t.me/theloi194).
 
 ## Credits
 

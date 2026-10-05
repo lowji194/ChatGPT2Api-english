@@ -57,6 +57,21 @@ const docs: ApiDoc[] = [
   -d '{"model":"auto","messages":[{"role":"user","content":"Hello"}]}'`,
   },
   {
+    title: "Tổng quota hình ảnh",
+    method: "GET",
+    path: "/v1/image-quota",
+    icon: ListChecks,
+    input: [["Authorization", "header", "Bearer <auth-key>."]],
+    output: [
+      ["total_remaining", "number", "Tổng số lượt tạo ảnh còn lại của các tài khoản đang hoạt động."],
+      ["active_accounts", "number", "Số tài khoản đang hoạt động."],
+      ["limited_accounts", "number", "Số tài khoản đang bị giới hạn."],
+      ["unit", "string", "Đơn vị quota, luôn là images."],
+    ],
+    example: (baseUrl: string, key: string) => `curl ${baseUrl}/image-quota \\
+  -H "Authorization: Bearer ${key}"`,
+  },
+  {
     title: "Responses",
     method: "POST",
     path: "/v1/responses",
@@ -220,6 +235,7 @@ const usableModels = ["auto", "gpt-5-6", "gpt-5-6-mini", "gpt-5-5", "gpt-5-5-min
 
 const responseExamples: Record<string, object> = {
   "/v1/models": { object: "list", data: [{ id: "auto", object: "model", owned_by: "chatgpt2api" }] },
+  "/v1/image-quota": { object: "image_quota", total_remaining: 380, active_accounts: 27, limited_accounts: 3, unit: "images" },
   "/v1/chat/completions": { id: "chatcmpl_example", object: "chat.completion", choices: [{ index: 0, message: { role: "assistant", content: "Hello! How can I help you?" }, finish_reason: "stop" }] },
   "/v1/responses": { id: "resp_example", object: "response", status: "completed", output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: "A future city powered by clean energy." }] }] },
   "/v1/search": { answer: "Search result summary", sources: [{ title: "Source title", url: "https://example.com" }] },
@@ -231,9 +247,12 @@ const responseExamples: Record<string, object> = {
 
 function CodeBlock({ code, language = "bash", label }: { code: string; language?: "bash" | "json"; label: string }) {
   const [copied, setCopied] = useState(false);
-  const tokens = code.split(/("(?:\\.|[^"\\])*"|\b(?:true|false|null)\b|\b\d+(?:\.\d+)?\b|(?:^|\s)(?:curl|-H|-d|-F)\b)/gm);
+  const displayCode = language === "bash"
+    ? code.replace(/\s+(-(?:H|d|F)\s)/g, " \\\\\n  $1")
+    : code;
+  const tokens = displayCode.split(/("(?:\\.|[^"\\])*"|\b(?:true|false|null)\b|\b\d+(?:\.\d+)?\b|(?:^|\s)(?:curl|-H|-d|-F)\b)/gm);
   const copy = async () => {
-    await navigator.clipboard.writeText(code);
+    await navigator.clipboard.writeText(displayCode);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1500);
   };
@@ -246,7 +265,7 @@ function CodeBlock({ code, language = "bash", label }: { code: string; language?
           {copied ? "Đã chép" : "Sao chép"}
         </Button>
       </div>
-      <pre className="max-h-80 overflow-auto p-4 text-[13px] leading-6 text-slate-200"><code>{tokens.map((token, index) => {
+      <pre className="whitespace-pre-wrap break-words p-4 text-[13px] leading-6 text-slate-200"><code>{tokens.map((token, index) => {
         if (!token) return null;
         const trimmed = token.trim();
         const color = token.startsWith('"') ? "text-emerald-300" : /^(true|false|null)$/.test(trimmed) ? "text-violet-300" : /^\d/.test(trimmed) ? "text-amber-300" : /^(curl|-H|-d|-F)$/.test(trimmed) ? "text-sky-300" : "text-slate-200";
