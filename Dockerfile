@@ -14,6 +14,18 @@ COPY CHANGELOG.md /app/CHANGELOG.md
 COPY web ./
 RUN NEXT_PUBLIC_APP_VERSION="$(cat /app/VERSION)" npm run build
 
+FROM --platform=$BUILDPLATFORM node:22-alpine AS web-en-build
+
+WORKDIR /app/web-en
+
+COPY web-en/package.json web-en/package-lock.json ./
+RUN npm ci
+
+COPY VERSION /app/VERSION
+COPY CHANGELOG.md /app/CHANGELOG.md
+COPY web-en ./
+RUN NEXT_PUBLIC_APP_VERSION="$(cat /app/VERSION)" npm run build
+
 
 FROM --platform=$TARGETPLATFORM python:3.13-slim AS app
 
@@ -26,11 +38,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# 安装系统依赖
-# - git: Git 存储后端需要
-# - libpq-dev: PostgreSQL 客户端库
-# - default-libmysqlclient-dev: MySQL 客户端库（如需用 mysqlclient 而非 pymysql 可用）
-# - gcc: 编译 psycopg2-binary 需要
+# System dependencies for Git/PostgreSQL storage and Python wheels.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     libpq-dev \
@@ -40,7 +48,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN pip install --upgrade pip
 
-# 直接用 pip 安装依赖，不再依赖 uv / pyproject.toml 的锁文件解析
+# Install runtime dependencies directly for a compact image.
 RUN pip install --no-cache-dir \
     "curl-cffi>=0.15.0" \
     "fastapi>=0.136.0" \
@@ -55,13 +63,14 @@ RUN pip install --no-cache-dir \
     "pymysql>=1.1.0"
 
 COPY main.py ./
-COPY config.json ./
+COPY config.example.json ./config.json
 COPY VERSION ./
 COPY api ./api
 COPY services ./services
 COPY utils ./utils
 COPY scripts ./scripts
 COPY --from=web-build /app/web/out ./web_dist
+COPY --from=web-en-build /app/web-en/out ./web_dist_en
 
 EXPOSE 80
 
